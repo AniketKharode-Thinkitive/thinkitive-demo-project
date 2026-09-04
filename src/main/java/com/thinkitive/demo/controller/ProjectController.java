@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.thinkitive.demo.dto.request.ManagerProjectRequestDTO;
 import com.thinkitive.demo.dto.request.ProjectRequestDTO;
+import com.thinkitive.demo.dto.response.ManagerProjectResponseDTO;
+import com.thinkitive.demo.dto.response.ManagerResponseDTIO;
 import com.thinkitive.demo.dto.response.ProjectResponseDTO;
 import com.thinkitive.demo.service.ProjectServiceImpl;
 
@@ -55,4 +58,23 @@ public class ProjectController {
 
         return "Project deleted successfully";
     }
+    @PostMapping("/{projectId}/managers/{managerID}")
+    public ManagerProjectResponseDTO giveManagerToProject(@PathVariable int branchId ,@PathVariable int projectId,@PathVariable int managerID ) {
+    		ManagerProjectResponseDTO assignManager = projectService.assignManager(branchId,projectId,managerID);
+    		return assignManager;
+    }
+    
+	@DeleteMapping("/{projectId}/managers/{managerId}")
+	public ManagerProjectResponseDTO removeManagerFromProject(@PathVariable int branchId, @PathVariable int projectId,@PathVariable int managerId) {
+
+		return projectService.removeManagerFromProject(branchId, projectId, managerId);
+	}
+
+	@GetMapping("/{projectId}/managers")
+	public List<ManagerResponseDTIO> getManagersByProject(@PathVariable int branchId, @PathVariable int projectId) {
+
+		return projectService.getManagersByProject(branchId, projectId);
+	}
+	
+	
 }

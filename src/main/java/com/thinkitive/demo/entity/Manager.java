@@ -1,11 +1,14 @@
 package com.thinkitive.demo.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -19,7 +22,11 @@ public class Manager {
 	@ManyToOne
 	private Branch branch;
 	@ManyToMany
-	private List<Project> projects;
+	@JoinTable(name = "manager_projects",joinColumns = @JoinColumn(name = "manager_id"),
+		    inverseJoinColumns = @JoinColumn(name = "project_id"))
+	private List<Project> projects=new ArrayList();
+	@OneToMany(mappedBy = "manager")
+	private List<Employee> employees = new ArrayList<>();
 	public Manager() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -59,6 +66,13 @@ public class Manager {
 
 	public void setProjects(List<Project> projects) {
 	    this.projects = projects;
+	}
+	public List<Employee> getEmployees() {
+	    return employees;
+	}
+
+	public void setEmployees(List<Employee> employees) {
+	    this.employees = employees;
 	}
 
 }

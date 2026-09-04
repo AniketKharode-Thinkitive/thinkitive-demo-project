@@ -1,9 +1,13 @@
 package com.thinkitive.demo.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Branch {
@@ -12,6 +16,8 @@ public class Branch {
 	private int id;
 	private String name;
 	private String location;
+	@OneToMany(mappedBy = "branch")
+	private List<Employee> employees = new ArrayList();
 	public Branch() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -46,7 +52,13 @@ public class Branch {
 		this.location=location;
 		
 	}
-	
+	public List<Employee> getEmployees() {
+	    return employees;
+	}
+
+	public void setEmployees(List<Employee> employees) {
+	    this.employees = employees;
+	}
 	
 
 }

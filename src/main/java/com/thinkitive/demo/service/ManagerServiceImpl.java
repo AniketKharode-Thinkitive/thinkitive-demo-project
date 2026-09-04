@@ -32,31 +32,24 @@ public class ManagerServiceImpl {
 		return new ManagerResponseDTIO(save.getId(),save.getName(),save.getBranch().getId());
 	}
 	
+	public List<ManagerResponseDTIO> getManagersByBranch(int branchId) {
 
-    public List<ManagerResponseDTIO> getManagersByBranch(
-            int branchId) {
+		List<Manager> managers = managerRepository.findAll();
 
-        List<Manager> managers = managerRepository.findAll();
+		List<ManagerResponseDTIO> responseList = new ArrayList();
 
-        List<ManagerResponseDTIO> responseList = new ArrayList();
+		for (Manager manager : managers) {
 
-        for (Manager manager : managers) {
+			ManagerResponseDTIO response = new ManagerResponseDTIO(manager.getId(), manager.getName(),
+					manager.getBranch().getId());
 
-            
-                ManagerResponseDTIO response =
-                        new ManagerResponseDTIO(
-                                manager.getId(),
-                                manager.getName(),
-                                manager.getBranch().getId()
-                        	    );
+			responseList.add(response);
 
-                responseList.add(response);
-            
-        }
+		}
 
-        return responseList;
-    }
-	
+		return responseList;
+	}
+
 	public ManagerResponseDTIO findManagerById(int bid,int mid) {
 		Optional<Branch> byId = branchRepository.findById(bid);
 		Branch branch = byId.get();
