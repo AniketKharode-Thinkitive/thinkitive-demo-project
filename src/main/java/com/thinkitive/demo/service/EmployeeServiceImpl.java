@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.thinkitive.demo.dto.request.EmployeeDTORequest;
 import com.thinkitive.demo.dto.request.ManagerRequestDTO;
+import com.thinkitive.demo.dto.response.EmployeeDTOResponseNative;
 import com.thinkitive.demo.dto.response.EmployeeResponseDTO;
 import com.thinkitive.demo.dto.response.ManagerResponseDTIO;
 import com.thinkitive.demo.entity.Branch;
@@ -53,21 +54,21 @@ public class EmployeeServiceImpl {
     		
     }
 
-	public List<EmployeeResponseDTO> getAll(int branchId) {
+	public List<EmployeeDTOResponseNative> getAll(int branchId) {
 
 		Optional<Branch> byId = branchRepository.findById(branchId);
 
 		Branch branch = byId.get();
 
-		List<Employee> employees = employeeRepository.findAll();
+		List<EmployeeDTOResponseNative> employees = employeeRepository.getAll();
 
-		List<EmployeeResponseDTO> list = new ArrayList();
+		List<EmployeeDTOResponseNative> list = new ArrayList();
 
-		for (Employee employee : employees) {
+		for (EmployeeDTOResponseNative employee : employees) {
 
-			if (employee.getBranch().getId() == branch.getId()) {
+			if (employee.getBranchId() == branch.getId()) {
 
-				EmployeeResponseDTO response = new EmployeeResponseDTO(employee.getId(), employee.getName(),employee.getSalary(), employee.getBranch().getId(), employee.getManager().getId(),employee.getProject().getId());
+				EmployeeDTOResponseNative response = new EmployeeDTOResponseNative(employee.getName(), employee.getSalary(), employee.getBranchId(), employee.getManagerId(), employee.getGovernmentId());
 
 				list.add(response);
 			}
@@ -76,22 +77,12 @@ public class EmployeeServiceImpl {
 		return list;
 	}
 
-	public EmployeeResponseDTO getById(int branchId, int employeeId) {
+	public EmployeeDTOResponseNative getById(int branchId, int employeeId) {
+	    EmployeeDTOResponseNative employee =
+	            employeeRepository.getById(branchId, employeeId);
 
-		Optional<Branch> byId = branchRepository.findById(branchId);
+	    return employee;
 
-		Branch branch = byId.get();
-
-		Optional<Employee> byId2 = employeeRepository.findById(employeeId);
-
-		Employee employee = byId2.get();
-
-		if (employee.getBranch().getId() != branch.getId()) {
-
-			throw new RuntimeException("Employee does not belong to this branch");
-		}
-
-		return new EmployeeResponseDTO(employee.getId(), employee.getName(), employee.getSalary(),employee.getBranch().getId(), employee.getManager().getId(), employee.getProject().getId());
 	}
 
 	public EmployeeResponseDTO update(int branchId, int employeeId, EmployeeDTORequest request) {
@@ -203,33 +194,12 @@ public class EmployeeServiceImpl {
 		return new EmployeeResponseDTO(save.getId(), save.getName(), save.getSalary(), save.getBranch().getId(), 0,save.getProject().getId());
 	}
 	
-	public List<EmployeeResponseDTO> getEmployeesByManager(int branchId, int managerId) {
+	public List<EmployeeDTOResponseNative> getEmployeesByManager(int branchId, int managerId) {
+		 List<EmployeeDTOResponseNative> all =
+		            employeeRepository.getEmployeesByManager(branchId,managerId);
 
-		Optional<Branch> byId = branchRepository.findById(branchId);
-
-		Branch branch = byId.get();
-
-		Optional<Manager> byId2 = managerRepository.findById(managerId);
-
-		Manager manager = byId2.get();
-
-		if (manager.getBranch().getId() != branch.getId()) {
-
-			throw new RuntimeException("Manager does not belong to this branch");
-		}
-
-		List<Employee> employees = manager.getEmployees();
-
-		List<EmployeeResponseDTO> list = new ArrayList<>();
-
-		for (Employee employee : employees) {
-
-			EmployeeResponseDTO response = new EmployeeResponseDTO(employee.getId(), employee.getName(),employee.getSalary(), employee.getBranch().getId(), employee.getManager().getId(),employee.getProject().getId());
-
-			list.add(response);
-		}
-
-		return list;
+		    return all;
+		
 	}
 	
 	public EmployeeResponseDTO assignProject(int branchId, int employeeId, int projectId) {
@@ -285,32 +255,16 @@ public class EmployeeServiceImpl {
 		return new EmployeeResponseDTO(save.getId(), save.getName(), save.getSalary(), save.getBranch().getId(),save.getManager().getId(), 0);
 	}
 
-	public List<EmployeeResponseDTO> getEmployeesByProject(int branchId, int projectId) {
+	public List<EmployeeDTOResponseNative> getEmployeesByProject(int branchId, int projectId) {
 
-		Optional<Branch> byId = branchRepository.findById(branchId);
+		
+		List<EmployeeDTOResponseNative> all =
+	            employeeRepository.getEmployeesByProject(branchId, projectId);
 
-		Branch branch = byId.get();
-
-		Optional<Project> byId2 = projectRepository.findById(projectId);
-
-		Project project = byId2.get();
-
-		if (project.getBranch().getId() != branch.getId()) {
-
-			throw new RuntimeException("Project does not belong to this branch");
-		}
-
-		List<Employee> employees = project.getEmployees();
-
-		List<EmployeeResponseDTO> list = new ArrayList<>();
-
-		for (Employee employee : employees) {
-
-			EmployeeResponseDTO response = new EmployeeResponseDTO(employee.getId(), employee.getName(),employee.getSalary(), employee.getBranch().getId(), employee.getManager().getId(),employee.getProject().getId());
-
-			list.add(response);
-		}
-
-		return list;
+	    return all;
+		
+	}
+	public List<EmployeeDTOResponseNative> getAllByBranch(int bid) {
+	    return employeeRepository.getAllByBranch(bid);
 	}
 }

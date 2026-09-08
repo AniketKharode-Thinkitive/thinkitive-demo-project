@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.thinkitive.demo.dto.request.BranchRequestDTO;
+import com.thinkitive.demo.dto.response.BranchDTOResponseNative;
 import com.thinkitive.demo.dto.response.BranchResponseDTO;
 import com.thinkitive.demo.entity.Branch;
 import com.thinkitive.demo.repo.BranchRepository;
@@ -34,14 +35,9 @@ public class BranchServiceImpl implements BranchService {
 	}
 
 	@Override
-	public List<BranchResponseDTO> getAllBranches() {
-		List<Branch> all = branchRepository.findAll();
-		List<BranchResponseDTO> list = new ArrayList();
-		for(Branch a:all) {
-			BranchResponseDTO br = new BranchResponseDTO(a.getId(),a.getName(),a.getLocation());
-			list.add(br);
-		}
-		return list;
+	public List<BranchDTOResponseNative> getAllBranches() {
+		return  branchRepository.getAll();
+			
 	}
 
 	@Override

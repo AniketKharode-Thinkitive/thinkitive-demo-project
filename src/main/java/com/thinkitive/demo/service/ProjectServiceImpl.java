@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.thinkitive.demo.dto.request.ManagerProjectRequestDTO;
 import com.thinkitive.demo.dto.request.ProjectRequestDTO;
+import com.thinkitive.demo.dto.response.ManagerDTOResponseNative;
 import com.thinkitive.demo.dto.response.ManagerProjectResponseDTO;
 import com.thinkitive.demo.dto.response.ManagerResponseDTIO;
+import com.thinkitive.demo.dto.response.ProjectDTOResponseNative;
 import com.thinkitive.demo.dto.response.ProjectResponseDTO;
 import com.thinkitive.demo.entity.Branch;
 import com.thinkitive.demo.entity.Manager;
@@ -49,22 +51,8 @@ public class ProjectServiceImpl {
 	        );
 	    }
 	 
-	 public List<ProjectResponseDTO> getProjectByBranch(int branchId) {
-		 List<Project> projects = projectRepository.findAll();
-
-	        List<ProjectResponseDTO> responseList = new ArrayList();
-
-	        for (Project project : projects) {
-
-	            if (project.getBranch().getId()!=(branchId)) {
-
-	                ProjectResponseDTO response =
-	                        new ProjectResponseDTO(project.getId(), project.getName(),project.getDescription(),project.getBranch().getId());
-
-	                responseList.add(response);
-	            }
-	 }
-	        return responseList;
+	 public List<ProjectDTOResponseNative> getProjectByBranch(int branchId) {
+		 return projectRepository.getAllByBranch(branchId);
 	 }
 	  public ProjectResponseDTO getProjectById( int  branchId,int projectId) {
 
@@ -153,24 +141,11 @@ public class ProjectServiceImpl {
 			return new ManagerProjectResponseDTO(manager.getId(), manager.getName(),project.getId() , project.getName(), branch.getId(), branch.getName());
 	  }
 
-	  public List<ManagerResponseDTIO> getManagersByProject(int branchId, int projectId) {
-		  Optional<Branch> byId = branchRepository.findById(branchId);
-			Branch branch = byId.get();
-			
-			Optional<Project> byId2 = projectRepository.findById(projectId);
-			Project project = byId2.get();
-			if(project.getBranch().getId()!=branch.getId()) {
-				throw new RuntimeException("Project is not of particular branch");
-			}
-			List<Manager> managers = project.getManagers();
-			List<ManagerResponseDTIO> list = new ArrayList<>();
-			for(Manager m:managers) {
-				ManagerResponseDTIO mr = new ManagerResponseDTIO(m.getId(), m.getName(), m.getBranch().getId());
-				list.add(mr);
-			}
-		return list;
-	  }
+	
 	  
+	  public List<ProjectDTOResponseNative> getAllProject(){
+		  return projectRepository.getAll();
+	  }
 	  
 	 
 	 

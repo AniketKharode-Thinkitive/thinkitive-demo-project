@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thinkitive.demo.dto.request.BranchRequestDTO;
+import com.thinkitive.demo.dto.response.BranchDTOResponseNative;
 import com.thinkitive.demo.dto.response.BranchResponseDTO;
 import com.thinkitive.demo.service.BranchService;
 
@@ -32,7 +33,7 @@ public class BranchController {
 			return branchService.getBranchById(id);
 		}
 		@GetMapping
-		public List<BranchResponseDTO> findAll(){
+		public List<BranchDTOResponseNative> findAll(){
 			return branchService.getAllBranches();
 		}
 		@PutMapping("/{id}")

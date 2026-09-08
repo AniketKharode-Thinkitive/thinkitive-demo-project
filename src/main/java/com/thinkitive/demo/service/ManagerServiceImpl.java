@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.thinkitive.demo.dto.request.ManagerRequestDTO;
+import com.thinkitive.demo.dto.response.ManagerDTOResponseNative;
 import com.thinkitive.demo.dto.response.ManagerResponseDTIO;
 import com.thinkitive.demo.entity.Branch;
 import com.thinkitive.demo.entity.Manager;
@@ -32,24 +33,14 @@ public class ManagerServiceImpl {
 		return new ManagerResponseDTIO(save.getId(),save.getName(),save.getBranch().getId());
 	}
 	
-	public List<ManagerResponseDTIO> getManagersByBranch(int branchId) {
+	public List<ManagerDTOResponseNative> getManagersByBranch(int branchId) {
 
-		List<Manager> managers = managerRepository.findAll();
-
-		List<ManagerResponseDTIO> responseList = new ArrayList();
-
-		for (Manager manager : managers) {
-
-			ManagerResponseDTIO response = new ManagerResponseDTIO(manager.getId(), manager.getName(),
-					manager.getBranch().getId());
-
-			responseList.add(response);
-
-		}
-
-		return responseList;
+		
+		 return managerRepository.getAllByBranch(branchId);
 	}
+	
 
+	
 	public ManagerResponseDTIO findManagerById(int bid,int mid) {
 		Optional<Branch> byId = branchRepository.findById(bid);
 		Branch branch = byId.get();

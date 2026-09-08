@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.thinkitive.demo.dto.request.ManagerProjectRequestDTO;
 import com.thinkitive.demo.dto.request.ProjectRequestDTO;
+import com.thinkitive.demo.dto.response.ManagerDTOResponseNative;
 import com.thinkitive.demo.dto.response.ManagerProjectResponseDTO;
 import com.thinkitive.demo.dto.response.ManagerResponseDTIO;
+import com.thinkitive.demo.dto.response.ProjectDTOResponseNative;
 import com.thinkitive.demo.dto.response.ProjectResponseDTO;
 import com.thinkitive.demo.service.ProjectServiceImpl;
 
@@ -33,7 +35,7 @@ public class ProjectController {
     }
 
     @GetMapping
-    public List<ProjectResponseDTO> getProjectsByBranch( @PathVariable int branchId) {
+    public List<ProjectDTOResponseNative> getProjectsByBranch( @PathVariable int branchId) {
 
         return projectService.getProjectByBranch(branchId);
     }
@@ -70,11 +72,7 @@ public class ProjectController {
 		return projectService.removeManagerFromProject(branchId, projectId, managerId);
 	}
 
-	@GetMapping("/{projectId}/managers")
-	public List<ManagerResponseDTIO> getManagersByProject(@PathVariable int branchId, @PathVariable int projectId) {
-
-		return projectService.getManagersByProject(branchId, projectId);
-	}
+	
 	
 	
 }

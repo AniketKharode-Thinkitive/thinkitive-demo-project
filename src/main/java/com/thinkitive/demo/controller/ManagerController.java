@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thinkitive.demo.dto.request.ManagerRequestDTO;
+import com.thinkitive.demo.dto.response.ManagerDTOResponseNative;
 import com.thinkitive.demo.dto.response.ManagerResponseDTIO;
 import com.thinkitive.demo.service.ManagerServiceImpl;
 
@@ -27,10 +28,11 @@ public class ManagerController {
 		return manager;
 }
 	@GetMapping
-	public List<ManagerResponseDTIO> findAllMan(@PathVariable int bid){
-		List<ManagerResponseDTIO> managersByBranch = msi.getManagersByBranch(bid);
+	public List<ManagerDTOResponseNative> findAllMan(@PathVariable int bid){
+		List<ManagerDTOResponseNative> managersByBranch = msi.getManagersByBranch(bid);
 		return managersByBranch;
 	}
+	
 	@GetMapping("/{managerId}")
 	public ManagerResponseDTIO findManagerById(@PathVariable int bid , @PathVariable int managerId ) {
 		ManagerResponseDTIO managerById = msi.findManagerById(bid, managerId);
@@ -45,4 +47,6 @@ public class ManagerController {
 	public void delete(@PathVariable int bid , @PathVariable int managerId) {
 		msi.delete(bid, managerId);
 	}
+	
+	
 }

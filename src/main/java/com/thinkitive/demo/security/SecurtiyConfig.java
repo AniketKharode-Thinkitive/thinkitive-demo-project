@@ -35,7 +35,7 @@ public class SecurtiyConfig {
 				
 				.requestMatchers("/api/branches/**").hasAnyRole("ADMIN", "MANAGER")
 
-				.requestMatchers("/api/users").hasRole("ADMIN").anyRequest().authenticated()
+				.requestMatchers("/api/users").permitAll().anyRequest().authenticated()
 				) 
 			 .exceptionHandling(exception -> exception
 			            .authenticationEntryPoint(
