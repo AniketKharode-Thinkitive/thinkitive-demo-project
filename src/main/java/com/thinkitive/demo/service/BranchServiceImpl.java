@@ -11,6 +11,7 @@ import com.thinkitive.demo.dto.request.BranchRequestDTO;
 import com.thinkitive.demo.dto.response.BranchDTOResponseNative;
 import com.thinkitive.demo.dto.response.BranchResponseDTO;
 import com.thinkitive.demo.entity.Branch;
+import com.thinkitive.demo.exception.customexception.ResourceNotFoundException;
 import com.thinkitive.demo.repo.BranchRepository;
 
 @Service
@@ -29,7 +30,10 @@ public class BranchServiceImpl implements BranchService {
 
 	@Override
 	public BranchResponseDTO getBranchById(int id) {
-		Optional<Branch> byId = branchRepository.findById(id);
+			Optional<Branch> byId = branchRepository.findById(id);
+		if(byId.isEmpty()) {
+			throw new ResourceNotFoundException("Branch Not Found: "+id);
+		}
 		Branch branch = byId.get();
 		return new BranchResponseDTO(branch.getId(),branch.getName(),branch.getLocation());
 	}

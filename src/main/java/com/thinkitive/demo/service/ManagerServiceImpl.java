@@ -12,6 +12,7 @@ import com.thinkitive.demo.dto.response.ManagerDTOResponseNative;
 import com.thinkitive.demo.dto.response.ManagerResponseDTIO;
 import com.thinkitive.demo.entity.Branch;
 import com.thinkitive.demo.entity.Manager;
+import com.thinkitive.demo.exception.customexception.ResourceNotFoundException;
 import com.thinkitive.demo.repo.BranchRepository;
 import com.thinkitive.demo.repo.ManagerRepository;
 @Service
@@ -24,6 +25,9 @@ public class ManagerServiceImpl {
 	
 	public ManagerResponseDTIO createManager(int bid , ManagerRequestDTO mr ) {
 		Optional<Branch> byId = branchRepository.findById(bid);
+		if(byId.isEmpty()) {
+	    	throw new ResourceNotFoundException("Branch  does not exist");
+	    }
 		Branch branch = byId.get();
 		Manager m = new Manager();
 		m.setName(mr.getName());
@@ -34,7 +38,10 @@ public class ManagerServiceImpl {
 	}
 	
 	public List<ManagerDTOResponseNative> getManagersByBranch(int branchId) {
-
+			Optional<Branch> byId = branchRepository.findById(branchId);
+			if(byId.isEmpty()) {
+				throw new ResourceNotFoundException("Branch Does Not exist");
+			}
 		
 		 return managerRepository.getAllByBranch(branchId);
 	}
@@ -43,11 +50,17 @@ public class ManagerServiceImpl {
 	
 	public ManagerResponseDTIO findManagerById(int bid,int mid) {
 		Optional<Branch> byId = branchRepository.findById(bid);
+		if(byId.isEmpty()) {
+			throw new ResourceNotFoundException("Branch Does Not exist");
+		}
 		Branch branch = byId.get();
 		Optional<Manager> byId2 = managerRepository.findById(mid);
+		if(byId2.isEmpty()) {
+			throw new ResourceNotFoundException("Manager Id Does Not exist");
+		}
 		Manager mr = byId2.get();
 		if(mr.getBranch().getId()!=bid) {
-			throw new RuntimeException("Manager does not exist");
+			throw new ResourceNotFoundException("Manager does not belong to this branch");
 		}
 		return new ManagerResponseDTIO(mr.getId(), mr.getName(), mr.getBranch().getId());
 	}

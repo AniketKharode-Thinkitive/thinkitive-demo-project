@@ -16,6 +16,8 @@ import com.thinkitive.demo.entity.Branch;
 import com.thinkitive.demo.entity.Employee;
 import com.thinkitive.demo.entity.Manager;
 import com.thinkitive.demo.entity.Project;
+import com.thinkitive.demo.exception.customexception.ResourceDoesNotMatchException;
+import com.thinkitive.demo.exception.customexception.ResourceNotFoundException;
 import com.thinkitive.demo.repo.BranchRepository;
 import com.thinkitive.demo.repo.EmployeeRepository;
 import com.thinkitive.demo.repo.ManagerRepository;
@@ -38,10 +40,19 @@ public class EmployeeServiceImpl {
     
     public EmployeeResponseDTO create(int branchId, EmployeeDTORequest request) {
     		Optional<Branch> byId = branchRepository.findById(branchId);
+    		if(byId.isEmpty()) {
+		    	throw new ResourceNotFoundException("Branch does not exist");
+		    }
     		Branch branch = byId.get();
     		Optional<Manager> byId2 = managerRepository.findById(request.getManagerId());
+    		if(byId2.isEmpty()) {
+		    	throw new ResourceNotFoundException("Manager  does not exist");
+		    }
     		Manager manager = byId2.get();
     		Optional<Project> byId3 = projectRepository.findById(request.getProjectId());
+    		if(byId3.isEmpty()) {
+		    	throw new ResourceNotFoundException("Project  does not exist");
+		    }
     		Project project = byId3.get();
     		Employee employee = new Employee();
     		employee.setName(request.getName());
@@ -57,6 +68,9 @@ public class EmployeeServiceImpl {
 	public List<EmployeeDTOResponseNative> getAll(int branchId) {
 
 		Optional<Branch> byId = branchRepository.findById(branchId);
+		if(byId.isEmpty()) {
+			throw new ResourceNotFoundException("Branch Id Does not exist:- "+branchId);
+		}
 
 		Branch branch = byId.get();
 
@@ -80,7 +94,9 @@ public class EmployeeServiceImpl {
 	public EmployeeDTOResponseNative getById(int branchId, int employeeId) {
 	    EmployeeDTOResponseNative employee =
 	            employeeRepository.getById(branchId, employeeId);
-
+	    if(employee==null) {
+	    	throw new ResourceNotFoundException("Employee does not exist");
+	    }
 	    return employee;
 
 	}
@@ -88,24 +104,32 @@ public class EmployeeServiceImpl {
 	public EmployeeResponseDTO update(int branchId, int employeeId, EmployeeDTORequest request) {
 
 		Optional<Branch> byId = branchRepository.findById(branchId);
-
+		  if(byId.isEmpty()) {
+		    	throw new ResourceNotFoundException("Branch does not exist");
+		    }
 		Branch branch = byId.get();
 
 		Optional<Employee> byId2 = employeeRepository.findById(employeeId);
-
+		  if(byId2.isEmpty()) {
+		    	throw new ResourceNotFoundException("Employee does not exist");
+		    }
 		Employee employee = byId2.get();
 
 		if (employee.getBranch().getId() != branch.getId()) {
 
-			throw new RuntimeException("Employee does not belong to this branch");
+			throw new ResourceDoesNotMatchException("Employee does not belong to this branch");
 		}
 
 		Optional<Manager> byId3 = managerRepository.findById(request.getManagerId());
-
+		  if(byId3.isEmpty()) {
+		    	throw new ResourceNotFoundException("Manager  does not exist");
+		    }
 		Manager manager = byId3.get();
 
 		Optional<Project> byId4 = projectRepository.findById(request.getProjectId());
-
+		if(byId4.isEmpty()) {
+	    	throw new ResourceNotFoundException("Branch  does not exist");
+	    }
 		Project project = byId4.get();
 
 		employee.setName(request.getName());
@@ -126,16 +150,20 @@ public class EmployeeServiceImpl {
 	public void delete(int branchId, int employeeId) {
 
 		Optional<Branch> byId = branchRepository.findById(branchId);
-
+		if(byId.isEmpty()) {
+	    	throw new ResourceNotFoundException("Branch  does not exist");
+	    }
 		Branch branch = byId.get();
 
 		Optional<Employee> byId2 = employeeRepository.findById(employeeId);
-
+		if(byId2.isEmpty()) {
+	    	throw new ResourceNotFoundException("Employee does not exist");
+	    }
 		Employee employee = byId2.get();
 
 		if (employee.getBranch().getId() != branch.getId()) {
 
-			throw new RuntimeException("Employee does not belong to this branch");
+			throw new ResourceNotFoundException("Employee does not belong to this branch");
 		}
 
 		employeeRepository.delete(employee);
@@ -144,25 +172,31 @@ public class EmployeeServiceImpl {
 	public EmployeeResponseDTO assignManager(int branchId, int employeeId, int managerId) {
 
 		Optional<Branch> byId = branchRepository.findById(branchId);
-
+		if(byId.isEmpty()) {
+	    	throw new ResourceNotFoundException("Branch  does not exist");
+	    }
 		Branch branch = byId.get();
 
 		Optional<Employee> byId2 = employeeRepository.findById(employeeId);
-
+		if(byId2.isEmpty()) {
+	    	throw new ResourceNotFoundException("Employee  does not exist");
+	    }
 		Employee employee = byId2.get();
 
 		if (employee.getBranch().getId() != branch.getId()) {
 
-			throw new RuntimeException("Employee does not belong to this branch");
+			throw new ResourceDoesNotMatchException("Employee does not belong to this branch");
 		}
 
 		Optional<Manager> byId3 = managerRepository.findById(managerId);
-
+		if(byId3.isEmpty()) {
+	    	throw new ResourceNotFoundException("Manager  does not exist");
+	    }
 		Manager manager = byId3.get();
 
 		if (manager.getBranch().getId() != branch.getId()) {
 
-			throw new RuntimeException("Manager does not belong to this branch");
+			throw new ResourceDoesNotMatchException("Manager does not belong to this branch");
 		}
 
 		employee.setManager(manager);
@@ -175,16 +209,20 @@ public class EmployeeServiceImpl {
 	public EmployeeResponseDTO removeManager(int branchId, int employeeId) {
 
 		Optional<Branch> byId = branchRepository.findById(branchId);
-
+		if(byId.isEmpty()) {
+	    	throw new ResourceNotFoundException("Branch  does not exist");
+	    }
 		Branch branch = byId.get();
 
 		Optional<Employee> byId2 = employeeRepository.findById(employeeId);
-
+		if(byId2.isEmpty()) {
+	    	throw new ResourceNotFoundException("Employee  does not exist");
+	    }
 		Employee employee = byId2.get();
 
 		if (employee.getBranch().getId() != branch.getId()) {
 
-			throw new RuntimeException("Employee does not belong to this branch");
+			throw new ResourceDoesNotMatchException("Employee does not belong to this branch");
 		}
 
 		employee.setManager(null);
@@ -197,6 +235,9 @@ public class EmployeeServiceImpl {
 	public List<EmployeeDTOResponseNative> getEmployeesByManager(int branchId, int managerId) {
 		 List<EmployeeDTOResponseNative> all =
 		            employeeRepository.getEmployeesByManager(branchId,managerId);
+		 if(all ==null) {
+			 	throw new ResourceNotFoundException("Employee does not exist");
+		 }
 
 		    return all;
 		
@@ -205,25 +246,31 @@ public class EmployeeServiceImpl {
 	public EmployeeResponseDTO assignProject(int branchId, int employeeId, int projectId) {
 
 		Optional<Branch> byId = branchRepository.findById(branchId);
-
+		if(byId.isEmpty()) {
+	    	throw new ResourceNotFoundException("Branch does not exist");
+	    }
 		Branch branch = byId.get();
 
 		Optional<Employee> byId2 = employeeRepository.findById(employeeId);
-
+		if(byId2.isEmpty()) {
+	    	throw new ResourceNotFoundException("Employee  does not exist");
+	    }
 		Employee employee = byId2.get();
 
 		if (employee.getBranch().getId() != branch.getId()) {
 
-			throw new RuntimeException("Employee does not belong to this branch");
+			throw new ResourceDoesNotMatchException("Employee does not belong to this branch");
 		}
 
 		Optional<Project> byId3 = projectRepository.findById(projectId);
-
+		if(byId3.isEmpty()) {
+	    	throw new ResourceNotFoundException("Project  does not exist");
+	    }
 		Project project = byId3.get();
 
 		if (project.getBranch().getId() != branch.getId()) {
 
-			throw new RuntimeException("Project does not belong to this branch");
+			throw new ResourceDoesNotMatchException("Project does not belong to this branch");
 		}
 
 		employee.setProject(project);
@@ -236,16 +283,20 @@ public class EmployeeServiceImpl {
 	public EmployeeResponseDTO removeProject(int branchId, int employeeId) {
 
 		Optional<Branch> byId = branchRepository.findById(branchId);
-
+		if(byId.isEmpty()) {
+	    	throw new ResourceNotFoundException("Branch  does not exist");
+	    }
 		Branch branch = byId.get();
 
 		Optional<Employee> byId2 = employeeRepository.findById(employeeId);
-
+		if(byId2.isEmpty()) {
+	    	throw new ResourceNotFoundException("Employee  does not exist");
+	    }
 		Employee employee = byId2.get();
 
 		if (employee.getBranch().getId() != branch.getId()) {
 
-			throw new RuntimeException("Employee does not belong to this branch");
+			throw new ResourceDoesNotMatchException("Employee does not belong to this branch");
 		}
 
 		employee.setProject(null);
@@ -260,11 +311,15 @@ public class EmployeeServiceImpl {
 		
 		List<EmployeeDTOResponseNative> all =
 	            employeeRepository.getEmployeesByProject(branchId, projectId);
+		if(all==null) {
+		 	throw new ResourceNotFoundException("Employee does not exist");
+		}
 
 	    return all;
 		
 	}
 	public List<EmployeeDTOResponseNative> getAllByBranch(int bid) {
+		branchRepository.findById(bid).orElseThrow( ()->new ResourceNotFoundException("Branch Does not exist"));
 	    return employeeRepository.getAllByBranch(bid);
 	}
 }
