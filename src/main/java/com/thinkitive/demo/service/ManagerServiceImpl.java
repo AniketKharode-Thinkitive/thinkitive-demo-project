@@ -1,8 +1,6 @@
 package com.thinkitive.demo.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,80 +10,90 @@ import com.thinkitive.demo.dto.response.ManagerDTOResponseNative;
 import com.thinkitive.demo.dto.response.ManagerResponseDTIO;
 import com.thinkitive.demo.entity.Branch;
 import com.thinkitive.demo.entity.Manager;
+import com.thinkitive.demo.exception.customexception.ResourceDoesNotMatchException;
 import com.thinkitive.demo.exception.customexception.ResourceNotFoundException;
 import com.thinkitive.demo.repo.BranchRepository;
 import com.thinkitive.demo.repo.ManagerRepository;
+
 @Service
 public class ManagerServiceImpl {
-	
+
 	@Autowired
 	private BranchRepository branchRepository;
+
 	@Autowired
 	private ManagerRepository managerRepository;
-	
-	public ManagerResponseDTIO createManager(int bid , ManagerRequestDTO mr ) {
-		Optional<Branch> byId = branchRepository.findById(bid);
-		if(byId.isEmpty()) {
-	    	throw new ResourceNotFoundException("Branch  does not exist");
-	    }
-		Branch branch = byId.get();
-		Manager m = new Manager();
-		m.setName(mr.getName());
-		m.setBranch(branch);
-		
-		Manager save = managerRepository.save(m);
-		return new ManagerResponseDTIO(save.getId(),save.getName(),save.getBranch().getId());
-	}
-	
-	public List<ManagerDTOResponseNative> getManagersByBranch(int branchId) {
-			Optional<Branch> byId = branchRepository.findById(branchId);
-			if(byId.isEmpty()) {
-				throw new ResourceNotFoundException("Branch Does Not exist");
-			}
-		
-		 return managerRepository.getAllByBranch(branchId);
-	}
-	
 
-	
-	public ManagerResponseDTIO findManagerById(int bid,int mid) {
-		Optional<Branch> byId = branchRepository.findById(bid);
-		if(byId.isEmpty()) {
-			throw new ResourceNotFoundException("Branch Does Not exist");
-		}
-		Branch branch = byId.get();
-		Optional<Manager> byId2 = managerRepository.findById(mid);
-		if(byId2.isEmpty()) {
-			throw new ResourceNotFoundException("Manager Id Does Not exist");
-		}
-		Manager mr = byId2.get();
-		if(mr.getBranch().getId()!=bid) {
-			throw new ResourceNotFoundException("Manager does not belong to this branch");
-		}
-		return new ManagerResponseDTIO(mr.getId(), mr.getName(), mr.getBranch().getId());
-	}
-	
-	public ManagerResponseDTIO update(int bid,int mid , ManagerRequestDTO mr) {
-		Optional<Branch> byId = branchRepository.findById(bid);
-		Branch branch = byId.get();
-		Optional<Manager> byId2 = managerRepository.findById(mid);
-		Manager manager = byId2.get();
-		if(manager.getBranch().getId()!=branch.getId()) {
-			throw new RuntimeException("Manager does not exist in this branch");
-		}	
+	public ManagerResponseDTIO createManager(int bid, ManagerRequestDTO mr) {
+
+		Branch branch = branchRepository.findById(bid)
+				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist: " + bid));
+
+		Manager manager = new Manager();
+
 		manager.setName(mr.getName());
-		Manager updated = managerRepository.save(manager);
-		return new ManagerResponseDTIO(updated.getId(), updated.getName(),updated.getBranch().getId());
+		manager.setBranch(branch);
+
+		Manager savedManager = managerRepository.save(manager);
+
+		return new ManagerResponseDTIO(savedManager.getId(), savedManager.getName(), savedManager.getBranch().getId());
 	}
-	
-	public void delete(int bid , int mid) {
-		Optional<Branch> byId = branchRepository.findById(bid);
-		Branch branch = byId.get();
-		Optional<Manager> byId2 = managerRepository.findById(mid);
-		Manager manager = byId2.get();
-		if(manager.getBranch().getId()!=branch.getId()) {
-			throw new RuntimeException("Manager does not exist in this branch");
-		}	
+
+	public List<ManagerDTOResponseNative> getManagersByBranch(int branchId) {
+
+		branchRepository.findById(branchId)
+				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist: " + branchId));
+
+		return managerRepository.getAllByBranch(branchId);
+	}
+
+	public ManagerResponseDTIO findManagerById(int bid, int mid) {
+
+		Branch branch = branchRepository.findById(bid)
+				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist: " + bid));
+
+		Manager manager = managerRepository.findById(mid)
+				.orElseThrow(() -> new ResourceNotFoundException("Manager does not exist: " + mid));
+
+		if (manager.getBranch().getId() != branch.getId()) {
+			throw new ResourceDoesNotMatchException("Manager does not belong to this branch");
+		}
+
+		return new ManagerResponseDTIO(manager.getId(), manager.getName(), manager.getBranch().getId());
+	}
+
+	public ManagerResponseDTIO update(int bid, int mid, ManagerRequestDTO mr) {
+
+		Branch branch = branchRepository.findById(bid)
+				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist: " + bid));
+
+		Manager manager = managerRepository.findById(mid)
+				.orElseThrow(() -> new ResourceNotFoundException("Manager does not exist: " + mid));
+
+		if (manager.getBranch().getId() != branch.getId()) {
+			throw new ResourceDoesNotMatchException("Manager does not belong to this branch");
+		}
+
+		manager.setName(mr.getName());
+
+		Manager updatedManager = managerRepository.save(manager);
+
+		return new ManagerResponseDTIO(updatedManager.getId(), updatedManager.getName(),
+				updatedManager.getBranch().getId());
+	}
+
+	public void delete(int bid, int mid) {
+
+		Branch branch = branchRepository.findById(bid)
+				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist: " + bid));
+
+		Manager manager = managerRepository.findById(mid)
+				.orElseThrow(() -> new ResourceNotFoundException("Manager does not exist: " + mid));
+
+		if (manager.getBranch().getId() != branch.getId()) {
+			throw new ResourceDoesNotMatchException("Manager does not belong to this branch");
+		}
+
 		managerRepository.delete(manager);
 	}
 }

@@ -1,11 +1,9 @@
 package com.thinkitive.demo.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import com.thinkitive.demo.dto.request.UserDTORequest;
@@ -13,87 +11,82 @@ import com.thinkitive.demo.dto.response.UserResponseDTO;
 import com.thinkitive.demo.entity.Employee;
 import com.thinkitive.demo.entity.Manager;
 import com.thinkitive.demo.entity.User;
+import com.thinkitive.demo.exception.customexception.ResourceNotFoundException;
 import com.thinkitive.demo.repo.EmployeeRepository;
 import com.thinkitive.demo.repo.ManagerRepository;
 import com.thinkitive.demo.repo.UserRepository;
+import com.thinkitive.demo.security.KeycloakAdminService;
 
 @Service
 public class UserServiceImpl {
-	
-	 @Autowired
-	    private UserRepository userRepository;
 
-	    @Autowired
-	    private ManagerRepository managerRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-	    @Autowired
-	    private EmployeeRepository employeeRepository;
-	    
-	    @Autowired
-	    private PasswordEncoder passwordEncoder;
-	    	
-	    public UserResponseDTO create(UserDTORequest request) {
+	@Autowired
+	private ManagerRepository managerRepository;
 
-	        User user = new User();
+	@Autowired
+	private EmployeeRepository employeeRepository;
 
-	        user.setUsername(request.getUsername());
+	@Autowired
+	private KeycloakAdminService keycloakAdminService;
 
-	        user.setPassword(
-	                passwordEncoder.encode(request.getPassword())
-	        );
+	public UserResponseDTO create(UserDTORequest request) {
 
-	        user.setRole(request.getRole());
+		Manager manager = null;
+		Employee employee = null;
 
-	        if (request.getRole().equals("MANAGER")) {
+		if (request.getRole().equals("MANAGER")) {
 
-	            Optional<Manager> byId = managerRepository.findById(request.getManagerId());
+			manager = managerRepository.findById(request.getManagerId())
+					.orElseThrow(() -> new ResourceNotFoundException("Manager Does Not Exist"));
+		}
 
-	            Manager manager = byId.get();
-	            user.setManager(manager);
-	        }
+		if (request.getRole().equals("EMPLOYEE")) {
 
-	        if (request.getRole().equals("EMPLOYEE")) {
+			employee = employeeRepository.findById(request.getEmployeeId())
+					.orElseThrow(() -> new ResourceNotFoundException("Employee Does Not Exist"));
+		}
 
-	            Optional<Employee> byId =
-	                    employeeRepository.findById(request.getEmployeeId());
+		String iamId = keycloakAdminService.createUser(request.getUsername(), request.getPassword(),
+				request.getFirstName(), request.getLastName(), request.getEmail());
 
-	            Employee employee = byId.get();
+		keycloakAdminService.assignRealmRole(iamId, request.getRole());
 
-	            user.setEmployee(employee);
-	        }
+		User user = new User();
 
-	        User save = userRepository.save(user);
+		user.setUsername(request.getUsername());
 
-	        int managerId = 0;
+		user.setRole(request.getRole());
 
-	        int employeeId = 0;
+		user.setIamId(iamId);
 
-	        if (save.getManager() != null) {
-	            managerId = save.getManager().getId();
-	        }
+		if (manager != null) {
+			user.setManager(manager);
+		}
 
-	        if (save.getEmployee() != null) {
-	            employeeId = save.getEmployee().getId();
-	        }
+		if (employee != null) {
+			user.setEmployee(employee);
+		}
 
-			return new UserResponseDTO(save.getId(),save.getUsername(),save.getRole(),save.getManager(),save.getEmployee() );
-	    }
-	    public User getLoggedInUser() {
+		User savedUser = userRepository.save(user);
 
-	        Authentication authentication =
-	                SecurityContextHolder.getContext().getAuthentication();
+		return new UserResponseDTO(savedUser.getId(), savedUser.getUsername())
+				;
+	}
 
-	        String username = authentication.getName();
+	public User getLoggedInUser() {
 
-	        Optional<User> byUsername =
-	                userRepository.findByUsername(username);
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-	        if (byUsername.isEmpty()) {
-	            throw new RuntimeException("User not found");
-	        }
+		Jwt jwt = (Jwt) authentication.getPrincipal();
 
-	        return byUsername.get();
-	    }
+		String iamId = jwt.getSubject();
 
-	    
+		User user = userRepository.findByIamId(iamId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+		return user;
+	}
 }

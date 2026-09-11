@@ -87,7 +87,7 @@ public class EmployeeController {
 
 	
 	@DeleteMapping("/{branchId}/employees/{employeeId}")
-	public ResponseEntity<StandardResponse> delete(@PathVariable int branchId, @PathVariable int employeeId,HttpServletRequest httpServletRequest) {
+	public ResponseEntity<StandardResponse> delete(@PathVariable int branchId, @PathVariable int employeeId) {
 		
 		employeeService.delete(branchId, employeeId);
 
@@ -96,7 +96,7 @@ public class EmployeeController {
 
 	
 	@PutMapping("/{branchId}/employees/{employeeId}/manager/{managerId}")
-	public ResponseEntity<StandardResponse<EmployeeResponseDTO>> assignManager(@PathVariable int branchId, @PathVariable int employeeId,@PathVariable int managerId,HttpServletRequest httpServletRequest) {
+	public ResponseEntity<StandardResponse> assignManager(@PathVariable int branchId, @PathVariable int employeeId,@PathVariable int managerId,HttpServletRequest httpServletRequest) {
 		String requestId = UUID.randomUUID().toString();
 	    String path = httpServletRequest.getRequestURI();
 		 EmployeeResponseDTO assignManager = employeeService.assignManager(branchId, employeeId, managerId);
@@ -105,35 +105,47 @@ public class EmployeeController {
 	}
 
 	
-//	@DeleteMapping("/{branchId}/employees/{employeeId}/manager")
-//	public EmployeeResponseDTO removeManager(@PathVariable int branchId, @PathVariable int employeeId) {
-//
-//		return employeeService.removeManager(branchId, employeeId);
-//	}
-//
-//	
-//	@GetMapping("/{branchId}/managers/{managerId}/employees")
-//	public List<EmployeeDTOResponseNative> getEmployeesByManager(@PathVariable int branchId, @PathVariable int managerId) {
-//
-//		return employeeService.getEmployeesByManager(branchId, managerId);
-//	}
-//
-//	@PutMapping("/{branchId}/employees/{employeeId}/project/{projectId}")
-//	public EmployeeResponseDTO assignProject(@PathVariable int branchId, @PathVariable int employeeId,
-//			@PathVariable int projectId) {
-//
-//		return employeeService.assignProject(branchId, employeeId, projectId);
-//	}
-//
-//	@DeleteMapping("/{branchId}/employees/{employeeId}/project")
-//	public EmployeeResponseDTO removeProject(@PathVariable int branchId, @PathVariable int employeeId) {
-//
-//		return employeeService.removeProject(branchId, employeeId);
-//	}
-//
-//	@GetMapping("/{branchId}/projects/{projectId}/employees")
-//	public List<EmployeeDTOResponseNative> getEmployeesByProject(@PathVariable int branchId, @PathVariable int projectId) {
-//
-//		return employeeService.getEmployeesByProject(branchId, projectId);
-//	}
+	@DeleteMapping("/{branchId}/employees/{employeeId}/manager")
+	public ResponseEntity<StandardResponse> removeManager(@PathVariable int branchId, @PathVariable int employeeId) {
+
+		employeeService.removeManager(branchId, employeeId);
+		return ResponseEntity.noContent().build();
+	}
+
+	
+	@GetMapping("/{branchId}/managers/{managerId}/employees")
+	public ResponseEntity<StandardResponse> getEmployeesByManager(@PathVariable int branchId, @PathVariable int managerId,HttpServletRequest httpServletRequest) {
+		String requestId = UUID.randomUUID().toString();
+	    String path = httpServletRequest.getRequestURI();
+		 List<EmployeeDTOResponseNative> employeesByManager = employeeService.getEmployeesByManager(branchId, managerId);
+		 StandardResponse<List<EmployeeDTOResponseNative>> data = StandardResponse.data(requestId, "Employees Fetched By Manager", employeesByManager, ResponseStatus.FETCHED, path);
+		 return ResponseEntity.ok(data);
+	}
+
+	@PutMapping("/{branchId}/employees/{employeeId}/project/{projectId}")
+	public ResponseEntity<StandardResponse> assignProject(@PathVariable int branchId, @PathVariable int employeeId,
+			@PathVariable int projectId , HttpServletRequest httpServletRequest) {
+		String requestId = UUID.randomUUID().toString();
+	    String path = httpServletRequest.getRequestURI();
+		EmployeeResponseDTO assignProject = employeeService.assignProject(branchId, employeeId, projectId);
+		StandardResponse<EmployeeResponseDTO> data = StandardResponse.data(requestId, "Project has been assigned", assignProject, ResponseStatus.UPDATED, path);
+		return ResponseEntity.ok(data);
+	}
+
+	@DeleteMapping("/{branchId}/employees/{employeeId}/project")
+	public ResponseEntity<StandardResponse> removeProject(@PathVariable int branchId, @PathVariable int employeeId) {
+
+		 employeeService.removeProject(branchId, employeeId);
+		 return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/{branchId}/projects/{projectId}/employees")
+	public ResponseEntity<StandardResponse> getEmployeesByProject(@PathVariable int branchId, @PathVariable int projectId,HttpServletRequest httpServletRequest) {
+		String requestId = UUID.randomUUID().toString();
+	    String path = httpServletRequest.getRequestURI();
+		List<EmployeeDTOResponseNative> employeesByProject = employeeService.getEmployeesByProject(branchId, projectId);
+		StandardResponse<List<EmployeeDTOResponseNative>> data = StandardResponse.data(requestId, "Fetched Employees Based on Project:- "+projectId, employeesByProject, ResponseStatus.FETCHED, path);
+		
+		 return ResponseEntity.ok(data);
+	}
 }

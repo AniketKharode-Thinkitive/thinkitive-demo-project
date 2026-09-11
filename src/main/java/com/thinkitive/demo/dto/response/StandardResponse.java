@@ -7,7 +7,11 @@ import java.util.Date;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.thinkitive.demo.util.ResponseStatus;
+
+
+@JsonPropertyOrder({ "code", "message", "path", "data", "localDateTime", "requestId", "success", "version" })
 
 public class StandardResponse<T> {
 
