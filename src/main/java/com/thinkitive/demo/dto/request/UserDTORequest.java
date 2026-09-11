@@ -21,10 +21,43 @@ public class UserDTORequest {
 	    private String role;
 
 	    
-	    private int managerId;
+	    private Integer managerId;
 
 	   
-	    private int employeeId;
+	    private Integer employeeId;
+	    private String firstName;
+	    private String lastName;
+	    private String email;
+
+
+		public String getFirstName() {
+			return firstName;
+		}
+
+
+		public void setFirstName(String firstName) {
+			this.firstName = firstName;
+		}
+
+
+		public String getLastName() {
+			return lastName;
+		}
+
+
+		public void setLastName(String lastName) {
+			this.lastName = lastName;
+		}
+
+
+		public String getEmail() {
+			return email;
+		}
+
+
+		public void setEmail(String email) {
+			this.email = email;
+		}
 
 
 		public UserDTORequest() {
@@ -35,26 +68,18 @@ public class UserDTORequest {
 
 
 
-		public UserDTORequest( String username, String password, String role, int managerId, int employeeId) {
+		public UserDTORequest(String username, String password, String role, Integer managerId, Integer employeeId,
+				String firstName, String lastName, String email) {
 			super();
 			this.username = username;
 			this.password = password;
 			this.role = role;
 			this.managerId = managerId;
 			this.employeeId = employeeId;
+			this.firstName = firstName;
+			this.lastName = lastName;
+			this.email = email;
 		}
-
-
-
-
-		@Override
-		public String toString() {
-			return "UserDTORequest [ username=" + username + ", password=" + password + ", role=" + role
-					+ ", managerId=" + managerId + ", employeeId=" + employeeId + "]";
-		}
-
-
-	
 
 
 		public String getUsername() {
@@ -87,38 +112,27 @@ public class UserDTORequest {
 		}
 
 
-
-
-		public int getManagerId() {
+		public Integer getManagerId() {
 			return managerId;
 		}
 
 
-
-
-		public void setManagerId(int managerId) {
+		public void setManagerId(Integer managerId) {
 			this.managerId = managerId;
 		}
 
 
-
-
-		public int getEmployeeId() {
+		public Integer getEmployeeId() {
 			return employeeId;
 		}
 
 
-
-
-		public void setEmployeeId(int employeeId) {
+		public void setEmployeeId(Integer employeeId) {
 			this.employeeId = employeeId;
 		}
 
 
-	
-	    
-	    
-		
-		
+
+
 
 }

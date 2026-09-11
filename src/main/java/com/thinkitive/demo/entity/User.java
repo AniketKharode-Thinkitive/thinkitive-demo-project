@@ -20,7 +20,7 @@ public class User {
 	    private String password;
 
 	    private String role;
-
+	    private String iamId;
 	    @OneToOne
 	    @JoinColumn(name = "manager_id")
 	    private Manager manager;
@@ -34,21 +34,26 @@ public class User {
 			// TODO Auto-generated constructor stub
 		}
 
-		public User(int id, String username, String password, String role, Manager manager, Employee employee) {
+		
+		@Override
+		public String toString() {
+			return "User [id=" + id + ", username=" + username + ", password=" + password + ", role=" + role
+					+ ", iamId=" + iamId + ", manager=" + manager + ", employee=" + employee + "]";
+		}
+
+
+		public User(int id, String username, String password, String role, String iamId, Manager manager,
+				Employee employee) {
 			super();
 			this.id = id;
 			this.username = username;
 			this.password = password;
 			this.role = role;
+			this.iamId = iamId;
 			this.manager = manager;
 			this.employee = employee;
 		}
 
-		@Override
-		public String toString() {
-			return "User [id=" + id + ", username=" + username + ", password=" + password + ", role=" + role
-					+ ", manager=" + manager + ", employee=" + employee + "]";
-		}
 
 		public int getId() {
 			return id;
@@ -97,7 +102,16 @@ public class User {
 		public void setEmployee(Employee employee) {
 			this.employee = employee;
 		}
-	    
+
+		public String getIamId() {
+			return iamId;
+		}
+
+		public void setIamId(String iamId) {
+			this.iamId = iamId;
+		}
+
+		
 
 
 }

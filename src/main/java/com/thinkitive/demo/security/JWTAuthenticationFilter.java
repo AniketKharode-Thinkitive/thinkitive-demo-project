@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 
-@Component
+
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 	@Autowired
 	private CustomeUserDetailService customeUserDetailService;

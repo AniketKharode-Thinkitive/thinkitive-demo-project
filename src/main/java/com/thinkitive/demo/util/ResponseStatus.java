@@ -5,5 +5,8 @@ public enum ResponseStatus {
     CREATED,
     UPDATED,
     DELETED,
-    FAILED
+    FAILED,
+    NOT_FOUND,
+    INTERNAL_SERVER_ERROR,
+    BAD_REQUEST
 }
